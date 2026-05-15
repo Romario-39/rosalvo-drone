@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rosalvo Drone — Sistema de Serviços</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+:root {
+  --green-dark: #1a3a2a;
+  --green-mid: #2d6a4f;
+  --green-light: #52b788;
+  --gold: #c9a84c;
+  --gold-light: #f5f0dc;
+  --cream: #f5f0e8;
+  --cream2: #ede8df;
+  --text: #1a1a1a;
+  --muted: #6b7280;
+  --border: #d5ccba;
+  --red: #dc2626;
+  --white: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--cream2);
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+  background: var(--green-dark);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.topbar-brand {
+  font-family: 'Playfair Display', serif;
+  color: var(--cream);
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-brand span {
+  color: var(--gold);
+}
+.topbar-tabs {
+  display: flex;
+  gap: 4px;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  color: rgba(245,240,232,0.55);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.tab-btn.active {
+  background: rgba(201,168,76,0.15);
+  color: var(--gold);
+}
+.tab-btn:hover:not(.active) {
+  color: var(--cream);
+  background: rgba(255,255,255,0.07);
+}
+
+/* ===== LAYOUT ===== */
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 16px 60px;
+}
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ===== FORM ===== */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.card-header {
+  background: var(--green-dark);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-header-title {
+  font-family: 'Playfair Display', serif;
+  color: var(--cream);
+  font-size: 15px;
+  font-weight: 700;
+}
+.card-header-icon {
+  color: var(--gold);
+  font-size: 16px;
+}
+.card-body { padding: 24px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.full { grid-template-columns: 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.field input, .field select, .field textarea {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px 12px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--cream);
+  transition: border-color 0.2s;
+  outline: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--green-mid);
+  background: white;
+}
+.field textarea { resize: vertical; min-height: 70px; }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+/* Comissões dinâmicas */
+.com-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+  padding: 14px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+.btn-remove {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: var(--red);
+  border-radius: 3px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  height: 40px;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-remove:hover { background: #fca5a5; }
+
+.btn-add {
+  background: none;
+  border: 1px dashed var(--green-mid);
+  color: var(--green-mid);
+  border-radius: 3px;
+  padding: 9px 18px;
+  cursor: pointer;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-add:hover { background: var(--green-mid); color: white; }
+
+/* Resumo preview */
+.preview-box {
+  background: var(--green-dark);
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin-top: 4px;
+}
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+  color: rgba(245,240,232,0.65);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.preview-row:last-child { border-bottom: none; }
+.preview-row.total {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 15px;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(201,168,76,0.3);
+}
+.preview-row.liquido {
+  color: var(--green-light);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Botão principal */
+.btn-primary {
+  background: var(--gold);
+  border: none;
+  color: var(--green-dark);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+.btn-primary:hover { background: #b8960a; }
+
+/* ===== HISTÓRICO ===== */
+.hist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.hist-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--green-dark);
+}
+.hist-count {
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--cream);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+.serv-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s;
+}
+.serv-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.serv-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.serv-card-info {}
+.serv-card-cliente {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--green-dark);
+}
+.serv-card-fazenda {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.serv-card-data {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--cream);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+.serv-card-bottom {
+  display: flex;
+  gap: 0;
+}
+.serv-card-stat {
+  flex: 1;
+  padding: 12px 16px;
+  border-right: 1px solid var(--border);
+}
+.serv-card-stat:last-child { border-right: none; }
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.stat-value {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+.stat-value.green { color: var(--green-mid); }
+.stat-value.gold { color: var(--gold); }
+
+.serv-card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--cream);
+  border-top: 1px solid var(--border);
+}
+.btn-sm {
+  border: none;
+  border-radius: 3px;
+  padding: 7px 16px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-recibo {
+  background: var(--green-dark);
+  color: var(--cream);
+}
+.btn-recibo:hover { background: var(--green-mid); }
+.btn-del {
+  background: #fee2e2;
+  color: var(--red);
+  border: 1px solid #fca5a5;
+}
+.btn-del:hover { background: #fca5a5; }
+
+/* Totais gerais */
+.totais-gerais {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.total-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.total-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.total-card.bruto::before { background: var(--green-mid); }
+.total-card.comissao::before { background: #8b5cf6; }
+.total-card.liquido::before { background: var(--gold); }
+.total-card-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.total-card-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+.total-card.bruto .total-card-value { color: var(--green-mid); }
+.total-card.comissao .total-card-value { color: #8b5cf6; }
+.total-card.liquido .total-card-value { color: var(--gold); }
+
+/* ===== RECIBO MODAL ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  overflow-y: auto;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; justify-content: center; align-items: flex-start; }
+.modal-box {
+  background: var(--cream);
+  width: 100%;
+  max-width: 700px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--cream2);
+  border-bottom: 1px solid var(--border);
+  justify-content: flex-end;
+}
+.btn-print {
+  background: var(--green-dark);
+  color: var(--cream);
+  border: none;
+  border-radius: 3px;
+  padding: 9px 20px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-print:hover { background: var(--green-mid); }
+.btn-close-modal {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 9px 20px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.btn-close-modal:hover { background: var(--border); }
+
+/* Recibo dentro do modal */
+#recibo-content {
+  padding: 0;
+}
+.rec-header {
+  background: var(--green-dark);
+  padding: 28px 36px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.rec-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  border: 2px solid rgba(201,168,76,0.15);
+}
+.rec-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.rec-company {
+  font-family: 'Playfair Display', serif;
+  color: var(--cream);
+  font-size: 20px;
+  font-weight: 700;
+}
+.rec-company-sub {
+  color: var(--green-light);
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.rec-title {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold);
+  font-size: 34px;
+  font-weight: 900;
+  text-align: right;
+}
+.rec-title-sub {
+  color: rgba(245,240,232,0.5);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: right;
+  margin-top: 2px;
+}
+.rec-gold-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  margin: 0 36px;
+}
+.rec-body { padding: 28px 36px; }
+.rec-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.rec-info-cell {
+  padding: 12px 16px;
+  border-right: 1px solid var(--border);
+}
+.rec-info-cell:last-child { border-right: none; }
+.rec-info-cell.full {
+  grid-column: 1 / -1;
+  border-right: none;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 40px;
+}
+.rec-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.rec-value { font-size: 13px; color: var(--text); font-weight: 600; }
+.rec-value.accent { color: var(--green-mid); }
+
+.rec-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green-dark);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rec-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.rec-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+.rec-table thead tr { background: var(--green-dark); }
+.rec-table thead th {
+  padding: 9px 12px;
+  text-align: left;
+  color: var(--cream);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.rec-table thead th:last-child { text-align: right; }
+.rec-table tbody tr { border-bottom: 1px solid #e5ddd0; }
+.rec-table tbody td { padding: 10px 12px; color: var(--text); }
+.rec-table tbody td:last-child { text-align: right; font-weight: 600; }
+
+.rec-totais {
+  background: var(--green-dark);
+  border-radius: 3px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+}
+.rec-totais-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 12px;
+  color: rgba(245,240,232,0.65);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.rec-totais-row:last-child { border-bottom: none; }
+.rec-totais-row.principal { color: var(--cream); font-weight: 600; }
+.rec-totais-row.destaque {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 14px;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(201,168,76,0.25);
+}
+.rec-totais-row.liquido { color: #7dd3b0; font-weight: 700; font-size: 14px; }
+
+.rec-obs {
+  border: 1px dashed var(--border);
+  border-radius: 2px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+.rec-obs-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.rec-obs-text { font-size: 11px; color: #4b5563; line-height: 1.6; }
+
+.rec-footer {
+  border-top: 1px solid var(--border);
+  padding: 14px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.4);
+}
+.rec-footer-info { font-size: 10px; color: var(--muted); }
+.rec-footer-stamp {
+  background: var(--green-dark);
+  color: var(--cream);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 1px;
+}
+
+/* Despesa alert */
+.despesa-alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 3px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+.despesa-label-r { font-size: 12px; font-weight: 600; color: #92400e; }
+.despesa-desc-r { font-size: 10px; color: #b45309; margin-top: 2px; }
+.despesa-val-r { font-size: 16px; font-weight: 700; color: #92400e; }
+
+/* Badge pago */
+.badge-pago {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid #bbf7d0;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--green-dark);
+  color: var(--cream);
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 999;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  border-left: 4px solid var(--gold);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid.three { grid-template-columns: 1fr 1fr; }
+  .com-item { grid-template-columns: 1fr 1fr; }
+  .totais-gerais { grid-template-columns: 1fr; }
+  .rec-info-grid { grid-template-columns: 1fr 1fr; }
+  .rec-info-cell.full { flex-direction: column; gap: 12px; }
+  .topbar-tabs .tab-btn { padding: 8px 10px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">🚁 Rosalvo <span>Drone</span></div>
+  <div class="topbar-tabs">
+    <button class="tab-btn active" onclick="showPanel('form')">➕ Novo Serviço</button>
+    <button class="tab-btn" onclick="showPanel('hist')">📋 Histórico</button>
+    <button class="tab-btn" onclick="showPanel('config')">⚙️ Config</button>
+  </div>
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+  <!-- PAINEL: NOVO SERVIÇO -->
+  <div id="panel-form" class="panel active">
+
+    <!-- Dados do serviço -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">📝</span>
+        <span class="card-header-title">Dados do Serviço</span>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field">
+            <label>Cliente</label>
+            <input type="text" id="f-cliente" placeholder="Nome do cliente" oninput="calcPreview()">
+          </div>
+          <div class="field">
+            <label>Fazenda / Propriedade</label>
+            <input type="text" id="f-fazenda" placeholder="Nome da fazenda">
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="form-grid three">
+          <div class="field">
+            <label>Data Início</label>
+            <input type="date" id="f-data-ini">
+          </div>
+          <div class="field">
+            <label>Data Fim</label>
+            <input type="date" id="f-data-fim">
+          </div>
+          <div class="field">
+            <label>Tipo de Serviço</label>
+            <input type="text" id="f-tipo" placeholder="Ex: Aplicação Herbicida" value="Aplicação de Herbicida via Drone">
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="form-grid three">
+          <div class="field">
+            <label>Área (hectares)</label>
+            <input type="number" id="f-ha" placeholder="0" min="0" step="0.1" oninput="calcPreview()">
+          </div>
+          <div class="field">
+            <label>Valor por Hectare (R$)</label>
+            <input type="number" id="f-valor-ha" placeholder="0,00" min="0" step="0.01" oninput="calcPreview()">
+          </div>
+          <div class="field">
+            <label>Status de Pagamento</label>
+            <select id="f-status">
+              <option value="Pago">Pago</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Parcial">Parcial</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comissões -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">💰</span>
+        <span class="card-header-title">Comissões</span>
+      </div>
+      <div class="card-body">
+
+        <!-- Quem arrumou o serviço -->
+        <div style="margin-bottom:18px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Quem Arrumou o Serviço</div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Nome</label>
+              <input type="text" id="c-arruma-nome" placeholder="Ex: Romário" oninput="calcPreview()">
+            </div>
+            <div class="field">
+              <label>Valor por ha</label>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
+                <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--green-mid);flex:1;text-align:center;">R$ 5,00 / ha</div>
+                <input type="hidden" id="c-arruma-val" value="5">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:1px;background:var(--border);margin-bottom:18px;"></div>
+
+        <!-- Piloto -->
+        <div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Piloto (Execução)</div>
+          <div class="form-grid" style="margin-bottom:12px;">
+            <div class="field">
+              <label>Nome do Piloto</label>
+              <input type="text" id="c-piloto-nome" placeholder="Ex: João" oninput="calcPreview()">
+            </div>
+          </div>
+
+          <!-- Dia Normal -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px;align-items:end;">
+            <div class="field">
+              <label>Hectares — Dia Normal</label>
+              <input type="number" id="c-piloto-ha-normal" placeholder="0" min="0" step="0.1" oninput="calcPreview()">
+            </div>
+            <div class="field">
+              <label>Valor fixo / ha</label>
+              <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--green-mid);text-align:center;">R$ 3,00 / ha</div>
+            </div>
+            <div class="field">
+              <label>Subtotal</label>
+              <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--text);text-align:center;" id="c-piloto-sub-normal">R$ 0,00</div>
+            </div>
+          </div>
+
+          <!-- Domingo / Feriado -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px;align-items:end;">
+            <div class="field">
+              <label>Hectares — Domingo/Feriado</label>
+              <input type="number" id="c-piloto-ha-feriado" placeholder="0" min="0" step="0.1" oninput="calcPreview()">
+            </div>
+            <div class="field">
+              <label>Valor fixo / ha</label>
+              <div style="background:#fff8ec;border:1px solid #f0dda0;border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:#92400e;text-align:center;">R$ 6,00 / ha</div>
+            </div>
+            <div class="field">
+              <label>Subtotal</label>
+              <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--text);text-align:center;" id="c-piloto-sub-feriado">R$ 0,00</div>
+            </div>
+          </div>
+
+          <!-- Total piloto -->
+          <div style="background:var(--green-dark);border-radius:3px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="color:rgba(245,240,232,0.7);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Total Piloto</span>
+            <span style="color:var(--gold);font-size:17px;font-weight:700;" id="c-piloto-preview">R$ 0,00</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">📊</span>
+        <span class="card-header-title">Resumo do Serviço</span>
+      </div>
+      <div class="card-body">
+        <div class="preview-box">
+          <div class="preview-row">
+            <span>Valor Bruto</span>
+            <span id="prev-bruto">R$ 0,00</span>
+          </div>
+          <div class="preview-row">
+            <span>Total Comissões</span>
+            <span id="prev-comissoes">R$ 0,00</span>
+          </div>
+          <div class="preview-row total">
+            <span>Líquido Rosalvo Drone</span>
+            <span id="prev-liquido">R$ 0,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Obs geral -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">📋</span>
+        <span class="card-header-title">Observações Gerais</span>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>Observações (opcional)</label>
+          <textarea id="f-obs" placeholder="Alguma observação sobre o serviço..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="salvarServico()">✅ Salvar e Gerar Recibo</button>
+  </div>
+
+  <!-- PAINEL: HISTÓRICO -->
+  <div id="panel-hist" class="panel">
+    <div class="hist-header">
+      <div class="hist-title">Histórico de Serviços</div>
+      <div class="hist-count" id="hist-count">0 serviços</div>
+    </div>
+
+    <div class="totais-gerais">
+      <div class="total-card bruto">
+        <div class="total-card-label">Total Bruto</div>
+        <div class="total-card-value" id="total-bruto">R$ 0,00</div>
+      </div>
+      <div class="total-card comissao">
+        <div class="total-card-label">Total Comissões</div>
+        <div class="total-card-value" id="total-comissoes">R$ 0,00</div>
+      </div>
+      <div class="total-card liquido">
+        <div class="total-card-label">Líquido Rosalvo Drone</div>
+        <div class="total-card-value" id="total-liquido">R$ 0,00</div>
+      </div>
+    </div>
+
+    <div id="hist-list">
+      <div class="empty-state">
+        <div class="icon">🚁</div>
+        <p>Nenhum serviço registrado ainda.<br>Cadastre o primeiro serviço!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL: CONFIGURAÇÕES -->
+  <div id="panel-config" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">🔗</span>
+        <span class="card-header-title">Conexão com Google Sheets</span>
+      </div>
+      <div class="card-body">
+
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:16px 18px;margin-bottom:20px;font-size:13px;color:#166534;line-height:1.7;">
+          <strong>Como configurar (só uma vez no computador):</strong><br><br>
+          <strong>1.</strong> Acesse <a href="https://sheets.google.com" target="_blank" style="color:#166534;">sheets.google.com</a> e crie uma planilha nova<br>
+          <strong>2.</strong> Clique em <strong>Extensões → Apps Script</strong><br>
+          <strong>3.</strong> Apague o que estiver lá e cole o código abaixo<br>
+          <strong>4.</strong> Clique em <strong>Implantar → Nova implantação</strong><br>
+          <strong>5.</strong> Tipo: <strong>App da Web</strong> · Acesso: <strong>Qualquer pessoa</strong><br>
+          <strong>6.</strong> Copie o link gerado e cole aqui embaixo
+        </div>
+
+        <div style="background:#1a1a2e;border-radius:4px;padding:16px 18px;margin-bottom:20px;font-family:monospace;font-size:11px;color:#a8dadc;line-height:1.8;overflow-x:auto;">
+function doPost(e) {<br>
+&nbsp;&nbsp;var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();<br>
+&nbsp;&nbsp;var data = JSON.parse(e.postData.contents);<br>
+&nbsp;&nbsp;if (sheet.getLastRow() === 0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sheet.appendRow(['Data','Cliente','Fazenda','Período','Serviço','Hectares','Valor/ha','Bruto','Status','Quem Arrumou','Com.Arruma','Piloto','Ha Normal','Ha Feriado','Com.Piloto','Total Com.','Líquido Rosalvo','Observações']);<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;sheet.appendRow([data.data,data.cliente,data.fazenda,data.periodo,data.tipo,data.hectares,data.valorHa,data.bruto,data.status,data.arrumaNome,data.comissaoArruma,data.pilotoNome,data.haNormal,data.haFeriado,data.comissaoPiloto,data.totalComissoes,data.liquidoRosalvo,data.obs]);<br>
+&nbsp;&nbsp;return ContentService.createTextOutput('OK');<br>
+}
+        </div>
+
+        <div class="field" style="margin-bottom:12px;">
+          <label>Cole aqui o link da sua implantação</label>
+          <input type="text" id="sheet-url-input" placeholder="https://script.google.com/macros/s/..." style="font-size:12px;">
+        </div>
+        <button class="btn-primary" onclick="salvarConfig()" style="margin-top:0;">💾 Salvar Configuração</button>
+
+        <div id="config-status" style="margin-top:12px;font-size:13px;text-align:center;color:var(--muted);"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- MODAL RECIBO -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-actions">
+      <button class="btn-close-modal" onclick="closeModal()">✕ Fechar</button>
+      <button class="btn-print" onclick="imprimirRecibo()">🖨️ Imprimir / Salvar PDF</button>
+    </div>
+    <div id="recibo-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STORAGE =====
+function getData() {
+  try { return JSON.parse(localStorage.getItem('rosalvo_servicos') || '[]'); }
+  catch(e) { return []; }
+}
+function saveData(d) {
+  localStorage.setItem('rosalvo_servicos', JSON.stringify(d));
+}
+
+// ===== TABS =====
+function showPanel(p) {
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.getElementById('panel-' + p).classList.add('active');
+  event.target.classList.add('active');
+  if (p === 'hist') renderHist();
+}
+
+// ===== COMISSÕES =====
+let comissoes = [];
+let comId = 0;
+
+function addComissao(nome='', tipo='', valorHa='') {
+  const id = ++comId;
+  comissoes.push({ id });
+  const div = document.createElement('div');
+  div.className = 'com-item';
+  div.id = 'com-' + id;
+  div.innerHTML = `
+    <div class="field">
+      <label>Nome</label>
+      <input type="text" id="cn-${id}" placeholder="Ex: Romário" value="${nome}" oninput="calcPreview()">
+    </div>
+    <div class="field">
+      <label>Tipo</label>
+      <input type="text" id="ct-${id}" placeholder="Ex: Serviço / Execução" value="${tipo}">
+    </div>
+    <div class="field">
+      <label>Valor por ha (R$)</label>
+      <input type="number" id="cv-${id}" placeholder="0,00" min="0" step="0.01" value="${valorHa}" oninput="calcPreview()">
+    </div>
+    <button class="btn-remove" onclick="removeComissao(${id})">🗑</button>
+  `;
+  document.getElementById('comissoes-list').appendChild(div);
+  calcPreview();
+}
+
+function removeComissao(id) {
+  comissoes = comissoes.filter(c => c.id !== id);
+  const el = document.getElementById('com-' + id);
+  if (el) el.remove();
+  calcPreview();
+}
+
+// ===== PREVIEW =====
+function fmt(v) {
+  return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function calcPreview() {
+  const ha = parseFloat(document.getElementById('f-ha').value) || 0;
+  const vha = parseFloat(document.getElementById('f-valor-ha').value) || 0;
+  const bruto = ha * vha;
+
+  const arrumaNome = document.getElementById('c-arruma-nome').value.trim();
+  const pilotoNome = document.getElementById('c-piloto-nome').value.trim();
+  const pilotoHaNormal = parseFloat(document.getElementById('c-piloto-ha-normal').value) || 0;
+  const pilotoHaFeriado = parseFloat(document.getElementById('c-piloto-ha-feriado').value) || 0;
+
+  const comArruma = arrumaNome ? ha * 5 : 0;
+  const comPilotoNormal = pilotoHaNormal * 3;
+  const comPilotoFeriado = pilotoHaFeriado * 6;
+  const comPiloto = pilotoNome ? (comPilotoNormal + comPilotoFeriado) : 0;
+  const totalCom = comArruma + comPiloto;
+  const liquido = bruto - totalCom;
+
+  document.getElementById('c-piloto-sub-normal').textContent = fmt(comPilotoNormal);
+  document.getElementById('c-piloto-sub-feriado').textContent = fmt(comPilotoFeriado);
+  document.getElementById('c-piloto-preview').textContent = fmt(comPiloto);
+  document.getElementById('prev-bruto').textContent = fmt(bruto);
+  document.getElementById('prev-comissoes').textContent = fmt(totalCom);
+  document.getElementById('prev-liquido').textContent = fmt(liquido);
+}
+
+// ===== SALVAR =====
+function salvarServico() {
+  const cliente = document.getElementById('f-cliente').value.trim();
+  const fazenda = document.getElementById('f-fazenda').value.trim();
+  const dataIni = document.getElementById('f-data-ini').value;
+  const dataFim = document.getElementById('f-data-fim').value;
+  const tipo = document.getElementById('f-tipo').value.trim();
+  const ha = parseFloat(document.getElementById('f-ha').value) || 0;
+  const vha = parseFloat(document.getElementById('f-valor-ha').value) || 0;
+  const status = document.getElementById('f-status').value;
+  const obs = document.getElementById('f-obs').value.trim();
+
+  const arrumaNome = document.getElementById('c-arruma-nome').value.trim();
+  const pilotoNome = document.getElementById('c-piloto-nome').value.trim();
+  const pilotoHaNormal = parseFloat(document.getElementById('c-piloto-ha-normal').value) || 0;
+  const pilotoHaFeriado = parseFloat(document.getElementById('c-piloto-ha-feriado').value) || 0;
+  const comPilotoNormal = pilotoHaNormal * 3;
+  const comPilotoFeriado = pilotoHaFeriado * 6;
+  const comPilotoTotal = comPilotoNormal + comPilotoFeriado;
+
+  if (!cliente || !fazenda || !ha || !vha) {
+    showToast('⚠️ Preencha cliente, fazenda, hectares e valor!');
+    return;
+  }
+
+  const bruto = ha * vha;
+  const coms = [];
+  if (arrumaNome) coms.push({ nome: arrumaNome, tipo: 'Serviço', valorHa: 5, total: ha * 5 });
+  if (pilotoNome) {
+    let det = [];
+    if (pilotoHaNormal > 0) det.push(`${pilotoHaNormal} ha × R$ 3,00`);
+    if (pilotoHaFeriado > 0) det.push(`${pilotoHaFeriado} ha × R$ 6,00`);
+    coms.push({
+      nome: pilotoNome,
+      tipo: 'Execução',
+      detalhe: det.join(' + '),
+      haNormal: pilotoHaNormal,
+      haFeriado: pilotoHaFeriado,
+      total: comPilotoTotal
+    });
+  }
+
+  const totalCom = coms.reduce((s, c) => s + c.total, 0);
+  const liquido = bruto - totalCom;
+
+  const servico = {
+    id: Date.now(),
+    cliente, fazenda, dataIni, dataFim, tipo,
+    ha, vha, bruto, status, obs,
+    comissoes: coms, totalCom, liquido,
+    criadoEm: new Date().toLocaleDateString('pt-BR')
+  };
+
+  const data = getData();
+  data.unshift(servico);
+  saveData(data);
+
+  showToast('✅ Serviço salvo com sucesso!');
+  enviarParaSheets(servico);
+  openRecibo(servico);
+  limparForm();
+}
+
+function limparForm() {
+  ['f-cliente','f-fazenda','f-data-ini','f-data-fim','f-ha','f-valor-ha','f-obs',
+   'c-arruma-nome','c-piloto-nome','c-piloto-ha-normal','c-piloto-ha-feriado'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-tipo').value = 'Aplicação de Herbicida via Drone';
+  document.getElementById('f-status').value = 'Pago';
+  calcPreview();
+}
+
+// ===== HISTÓRICO =====
+function renderHist() {
+  const data = getData();
+  const list = document.getElementById('hist-list');
+  const count = document.getElementById('hist-count');
+
+  count.textContent = data.length + ' serviço' + (data.length !== 1 ? 's' : '');
+
+  let tBruto = 0, tCom = 0, tLiq = 0;
+  data.forEach(s => { tBruto += s.bruto||0; tCom += s.totalCom||0; tLiq += s.liquido||0; });
+  document.getElementById('total-bruto').textContent = fmt(tBruto);
+  document.getElementById('total-comissoes').textContent = fmt(tCom);
+  document.getElementById('total-liquido').textContent = fmt(tLiq);
+
+  if (!data.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🚁</div><p>Nenhum serviço registrado ainda.<br>Cadastre o primeiro serviço!</p></div>';
+    return;
+  }
+
+  list.innerHTML = data.map(s => `
+    <div class="serv-card">
+      <div class="serv-card-top">
+        <div class="serv-card-info">
+          <div class="serv-card-cliente">${s.cliente}</div>
+          <div class="serv-card-fazenda">📍 ${s.fazenda} · ${s.ha} ha · ${s.tipo}</div>
+        </div>
+        <div class="serv-card-data">${formatPeriodo(s.dataIni, s.dataFim)} · ${s.criadoEm}</div>
+      </div>
+      <div class="serv-card-bottom">
+        <div class="serv-card-stat">
+          <div class="stat-label">Bruto</div>
+          <div class="stat-value green">${fmt(s.bruto)}</div>
+        </div>
+        <div class="serv-card-stat">
+          <div class="stat-label">Comissões</div>
+          <div class="stat-value">${fmt(s.totalCom)}</div>
+        </div>
+        <div class="serv-card-stat">
+          <div class="stat-label">Despesas</div>
+          <div class="stat-value">${fmt(s.despVal||0)}</div>
+        </div>
+        <div class="serv-card-stat">
+          <div class="stat-label">Líquido Rosalvo</div>
+          <div class="stat-value gold">${fmt(s.liquido)}</div>
+        </div>
+      </div>
+      <div class="serv-card-actions">
+        <button class="btn-sm btn-recibo" onclick='openRecibo(${JSON.stringify(s).replace(/'/g,"&#39;")})'>🖨️ Ver Recibo</button>
+        <button class="btn-sm btn-del" onclick="deletarServico(${s.id})">🗑️ Excluir</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function formatPeriodo(ini, fim) {
+  if (!ini && !fim) return '—';
+  const f = d => d ? d.split('-').reverse().join('/') : '';
+  if (ini && fim) return f(ini) + ' – ' + f(fim);
+  return f(ini) || f(fim);
+}
+
+function deletarServico(id) {
+  if (!confirm('Excluir este serviço?')) return;
+  saveData(getData().filter(s => s.id !== id));
+  renderHist();
+  showToast('🗑️ Serviço excluído.');
+}
+
+// ===== RECIBO =====
+function openRecibo(s) {
+  const periodo = formatPeriodo(s.dataIni, s.dataFim);
+  const hoje = new Date().toLocaleDateString('pt-BR');
+
+  let comsRows = s.comissoes.map(c => {
+    const calculo = c.detalhe ? c.detalhe : `${s.ha} ha × ${fmt(c.valorHa||0)}`;
+    return `
+    <tr>
+      <td>${c.nome}</td>
+      <td>${c.tipo}</td>
+      <td>${calculo}</td>
+      <td>${fmt(c.total)}</td>
+    </tr>`;
+  }).join('');
+
+  let totaisRows = `
+    <div class="rec-totais-row principal"><span>Valor Bruto</span><span>${fmt(s.bruto)}</span></div>
+  `;
+  s.comissoes.forEach(c => {
+    totaisRows += `<div class="rec-totais-row"><span>( – ) ${c.tipo} — ${c.nome}</span><span>${fmt(c.total)}</span></div>`;
+  });
+
+  // Total por pessoa
+  const totalPorNome = {};
+  s.comissoes.forEach(c => {
+    if (!totalPorNome[c.nome]) totalPorNome[c.nome] = 0;
+    totalPorNome[c.nome] += c.total;
+  });
+  Object.entries(totalPorNome).forEach(([nome, total]) => {
+    totaisRows += `<div class="rec-totais-row destaque"><span>Total ${nome}</span><span>${fmt(total)}</span></div>`;
+  });
+  totaisRows += `<div class="rec-totais-row liquido"><span>Líquido Rosalvo Drone</span><span>${fmt(s.liquido)}</span></div>`;
+
+  const obsHtml = s.obs ? `
+    <div class="rec-obs">
+      <div class="rec-obs-label">Observações</div>
+      <div class="rec-obs-text">${s.obs}</div>
+    </div>
+  ` : '';
+
+  document.getElementById('recibo-content').innerHTML = `
+    <div class="rec-header">
+      <div class="rec-header-top">
+        <div>
+          <div class="rec-company">Rosalvo Drone</div>
+          <div class="rec-company-sub">Tecnologia Agrícola de Precisão</div>
+        </div>
+        <div>
+          <div class="rec-title">RECIBO</div>
+          <div class="rec-title-sub">Comprovante de Serviço</div>
+        </div>
+      </div>
+    </div>
+    <div class="rec-gold-line"></div>
+    <div class="rec-body">
+      <div class="rec-info-grid">
+        <div class="rec-info-cell"><div class="rec-label">Cliente</div><div class="rec-value accent">${s.cliente}</div></div>
+        <div class="rec-info-cell"><div class="rec-label">Fazenda</div><div class="rec-value">${s.fazenda}</div></div>
+        <div class="rec-info-cell"><div class="rec-label">Período</div><div class="rec-value">${periodo}</div></div>
+        <div class="rec-info-cell full">
+          <div><div class="rec-label">Serviço</div><div class="rec-value">${s.tipo}</div></div>
+          <div><div class="rec-label">Área</div><div class="rec-value accent">${s.ha} hectares</div></div>
+        </div>
+      </div>
+
+      <div class="rec-section-title">Serviço Prestado</div>
+      <table class="rec-table" style="margin-bottom:20px">
+        <thead><tr><th>Descrição</th><th>Qtd</th><th>Valor/ha</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>${s.tipo} <span class="badge-pago">${s.status}</span></td>
+            <td>${s.ha} ha</td>
+            <td>${fmt(s.vha)}</td>
+            <td>${fmt(s.bruto)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      ${s.comissoes.length > 0 ? `
+      <div class="rec-section-title">Comissões</div>
+      <table class="rec-table" style="margin-bottom:20px">
+        <thead><tr><th>Nome</th><th>Tipo</th><th>Cálculo</th><th>Valor</th></tr></thead>
+        <tbody>${comsRows}</tbody>
+      </table>
+      <div class="rec-section-title">Demonstrativo</div>
+      <div class="rec-totais">${totaisRows}</div>
+      ` : ''}
+
+      ${obsHtml}
+    </div>
+    <div class="rec-footer">
+      <div class="rec-footer-info">Rosalvo Drone · Emitido em ${hoje}</div>
+      <div class="rec-footer-stamp">${s.status} ✓</div>
+    </div>
+  `;
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function imprimirRecibo() {
+  const conteudo = document.getElementById('recibo-content').innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <!DOCTYPE html><html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <title>Recibo — Rosalvo Drone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+      :root{--green-dark:#1a3a2a;--green-mid:#2d6a4f;--green-light:#52b788;--gold:#c9a84c;--cream:#f5f0e8;--border:#d5ccba;--text:#1a1a1a;--muted:#6b7280}
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Source Sans 3',sans-serif;background:var(--cream)}
+      .rec-header{background:var(--green-dark);padding:28px 36px 22px;position:relative;overflow:hidden}
+      .rec-header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;border:2px solid rgba(201,168,76,0.15)}
+      .rec-header-top{display:flex;justify-content:space-between;align-items:flex-start}
+      .rec-company{font-family:'Playfair Display',serif;color:var(--cream);font-size:20px;font-weight:700}
+      .rec-company-sub{color:var(--green-light);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;margin-top:3px}
+      .rec-title{font-family:'Playfair Display',serif;color:var(--gold);font-size:34px;font-weight:900;text-align:right}
+      .rec-title-sub{color:rgba(245,240,232,0.5);font-size:10px;letter-spacing:3px;text-transform:uppercase;text-align:right;margin-top:2px}
+      .rec-gold-line{height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin:0 36px}
+      .rec-body{padding:28px 36px}
+      .rec-info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:24px}
+      .rec-info-cell{padding:12px 16px;border-right:1px solid var(--border)}
+      .rec-info-cell:last-child{border-right:none}
+      .rec-info-cell.full{grid-column:1/-1;border-right:none;border-top:1px solid var(--border);display:flex;gap:40px}
+      .rec-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+      .rec-value{font-size:13px;color:var(--text);font-weight:600}
+      .rec-value.accent{color:var(--green-mid)}
+      .rec-section-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:var(--green-dark);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+      .rec-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+      .rec-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12px}
+      .rec-table thead tr{background:var(--green-dark)}
+      .rec-table thead th{padding:9px 12px;text-align:left;color:var(--cream);font-size:9px;letter-spacing:1.5px;text-transform:uppercase}
+      .rec-table thead th:last-child{text-align:right}
+      .rec-table tbody tr{border-bottom:1px solid #e5ddd0}
+      .rec-table tbody td{padding:10px 12px;color:var(--text)}
+      .rec-table tbody td:last-child{text-align:right;font-weight:600}
+      .rec-totais{background:var(--green-dark);border-radius:3px;padding:18px 22px;margin-bottom:20px}
+      .rec-totais-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;color:rgba(245,240,232,0.65);border-bottom:1px solid rgba(255,255,255,0.07)}
+      .rec-totais-row:last-child{border-bottom:none}
+      .rec-totais-row.principal{color:var(--cream);font-weight:600}
+      .rec-totais-row.destaque{color:var(--gold);font-weight:700;font-size:14px;padding-top:10px;margin-top:4px;border-top:1px solid rgba(201,168,76,0.25)}
+      .rec-totais-row.liquido{color:#7dd3b0;font-weight:700;font-size:14px}
+      .rec-obs{border:1px dashed var(--border);border-radius:2px;padding:12px 16px;background:rgba(255,255,255,0.5);margin-bottom:20px}
+      .rec-obs-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+      .rec-obs-text{font-size:11px;color:#4b5563;line-height:1.6}
+      .rec-footer{border-top:1px solid var(--border);padding:14px 36px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.4)}
+      .rec-footer-info{font-size:10px;color:var(--muted)}
+      .rec-footer-stamp{background:var(--green-dark);color:var(--cream);font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:1px}
+      .despesa-alert{display:flex;justify-content:space-between;align-items:center;background:#fffbeb;border:1px solid #fde68a;border-radius:3px;padding:12px 16px;margin-bottom:20px}
+      .despesa-label-r{font-size:12px;font-weight:600;color:#92400e}
+      .despesa-desc-r{font-size:10px;color:#b45309;margin-top:2px}
+      .despesa-val-r{font-size:16px;font-weight:700;color:#92400e}
+      .badge-pago{display:inline-block;background:#dcfce7;color:#15803d;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:20px;border:1px solid #bbf7d0;margin-left:6px;vertical-align:middle}
+    </style>
+    </head><body>${conteudo}</body></html>
+  `);
+  win.document.close();
+  setTimeout(() => win.print(), 600);
+}
+
+// ===== GOOGLE SHEETS =====
+function salvarConfig() {
+  const url = document.getElementById('sheet-url-input').value.trim();
+  if (!url || !url.startsWith('https://script.google.com')) {
+    document.getElementById('config-status').innerHTML = '⚠️ Cole um link válido do Google Apps Script.';
+    return;
+  }
+  saveSheetUrl(url);
+  document.getElementById('config-status').innerHTML = '✅ Configurado! A partir de agora cada serviço salvo vai direto para sua planilha.';
+}
+
+function getSheetUrl() {
+  return localStorage.getItem('rosalvo_sheet_url') || '';
+}
+function saveSheetUrl(url) {
+  localStorage.setItem('rosalvo_sheet_url', url);
+}
+
+async function enviarParaSheets(servico) {
+  const url = getSheetUrl();
+  if (!url) return; // sem URL configurada, pula silenciosamente
+  try {
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: servico.criadoEm,
+        cliente: servico.cliente,
+        fazenda: servico.fazenda,
+        periodo: formatPeriodo(servico.dataIni, servico.dataFim),
+        tipo: servico.tipo,
+        hectares: servico.ha,
+        valorHa: servico.vha,
+        bruto: servico.bruto,
+        status: servico.status,
+        arrumaNome: servico.comissoes.find(c=>c.tipo==='Serviço')?.nome || '',
+        comissaoArruma: servico.comissoes.find(c=>c.tipo==='Serviço')?.total || 0,
+        pilotoNome: servico.comissoes.find(c=>c.tipo==='Execução')?.nome || '',
+        haNormal: servico.comissoes.find(c=>c.tipo==='Execução')?.haNormal || 0,
+        haFeriado: servico.comissoes.find(c=>c.tipo==='Execução')?.haFeriado || 0,
+        comissaoPiloto: servico.comissoes.find(c=>c.tipo==='Execução')?.total || 0,
+        totalComissoes: servico.totalCom,
+        liquidoRosalvo: servico.liquido,
+        obs: servico.obs
+      })
+    });
+  } catch(e) {
+    console.log('Erro ao enviar para Sheets:', e);
+  }
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== INIT =====
+// Mostrar URL configurada se existir
+window.addEventListener('load', () => {
+  const url = getSheetUrl();
+  const input = document.getElementById('sheet-url-input');
+  if (input && url) input.value = url;
+});
+
+// Fechar modal clicando fora
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
