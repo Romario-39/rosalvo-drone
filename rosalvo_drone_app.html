@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>Rosalvo Drone — Sistema de Serviços</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;500;600&display=swap');
@@ -477,7 +477,7 @@ body {
   padding: 0;
 }
 .rec-header {
-  background: var(--green-dark);
+  background: linear-gradient(135deg, #1a3a2a 0%, #0d2018 100%);
   padding: 28px 36px 22px;
   position: relative;
   overflow: hidden;
@@ -486,9 +486,17 @@ body {
   content: '';
   position: absolute;
   top: -40px; right: -40px;
-  width: 180px; height: 180px;
+  width: 200px; height: 200px;
   border-radius: 50%;
-  border: 2px solid rgba(201,168,76,0.15);
+  border: 2px solid rgba(201,168,76,0.25);
+}
+.rec-header::after {
+  content: '';
+  position: absolute;
+  top: -15px; right: -15px;
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.15);
 }
 .rec-header-top {
   display: flex;
@@ -497,26 +505,28 @@ body {
 }
 .rec-company {
   font-family: 'Playfair Display', serif;
-  color: var(--cream);
-  font-size: 20px;
+  color: #ffffff;
+  font-size: 24px;
   font-weight: 700;
+  letter-spacing: 0.5px;
 }
 .rec-company-sub {
   color: var(--green-light);
   font-size: 10px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 .rec-title {
   font-family: 'Playfair Display', serif;
   color: var(--gold);
-  font-size: 34px;
+  font-size: 42px;
   font-weight: 900;
   text-align: right;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .rec-title-sub {
-  color: rgba(245,240,232,0.5);
+  color: rgba(245,240,232,0.6);
   font-size: 10px;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -524,8 +534,8 @@ body {
   margin-top: 2px;
 }
 .rec-gold-line {
-  height: 2px;
-  background: linear-gradient(90deg, var(--gold), transparent);
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), rgba(201,168,76,0.2), transparent);
   margin: 0 36px;
 }
 .rec-body { padding: 28px 36px; }
@@ -534,9 +544,10 @@ body {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0;
   border: 1px solid var(--border);
-  border-radius: 2px;
+  border-radius: 4px;
   overflow: hidden;
   margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .rec-info-cell {
   padding: 12px 16px;
@@ -600,36 +611,42 @@ body {
 .rec-table tbody td:last-child { text-align: right; font-weight: 600; }
 
 .rec-totais {
-  background: var(--green-dark);
-  border-radius: 3px;
-  padding: 18px 22px;
+  background: linear-gradient(135deg, #1a3a2a 0%, #0d2018 100%);
+  border-radius: 6px;
+  padding: 20px 24px;
   margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 .rec-totais-row {
   display: flex;
   justify-content: space-between;
-  padding: 6px 0;
-  font-size: 12px;
-  color: rgba(245,240,232,0.65);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 7px 0;
+  font-size: 13px;
+  color: rgba(245,240,232,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .rec-totais-row:last-child { border-bottom: none; }
-.rec-totais-row.principal { color: var(--cream); font-weight: 600; }
+.rec-totais-row.principal { color: #ffffff; font-weight: 700; font-size: 14px; }
 .rec-totais-row.destaque {
   color: var(--gold);
   font-weight: 700;
-  font-size: 14px;
-  padding-top: 10px;
+  font-size: 15px;
+  padding-top: 12px;
   margin-top: 4px;
-  border-top: 1px solid rgba(201,168,76,0.25);
+  border-top: 1px solid rgba(201,168,76,0.3);
 }
-.rec-totais-row.liquido { color: #7dd3b0; font-weight: 700; font-size: 14px; }
-
+.rec-totais-row.liquido {
+  color: #5eead4;
+  font-weight: 800;
+  font-size: 17px;
+  padding-top: 8px;
+}
 .rec-obs {
-  border: 1px dashed var(--border);
-  border-radius: 2px;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.5);
+  border: 1px solid #d5ccba;
+  border-left: 4px solid var(--gold);
+  border-radius: 4px;
+  padding: 14px 18px;
+  background: #fffdf7;
   margin-bottom: 20px;
 }
 .rec-obs-label {
@@ -637,9 +654,10 @@ body {
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+  font-weight: 700;
 }
-.rec-obs-text { font-size: 11px; color: #4b5563; line-height: 1.6; }
+.rec-obs-text { font-size: 12px; color: #374151; line-height: 1.7; }
 
 .rec-footer {
   border-top: 1px solid var(--border);
@@ -776,11 +794,11 @@ body {
         <div class="form-grid three">
           <div class="field">
             <label>Área (hectares)</label>
-            <input type="number" id="f-ha" placeholder="0" min="0" step="0.1" oninput="calcPreview()">
+            <input type="text" inputmode="decimal" id="f-ha" placeholder="0" oninput="calcPreview()" onchange="calcPreview()">
           </div>
           <div class="field">
             <label>Valor por Hectare (R$)</label>
-            <input type="number" id="f-valor-ha" placeholder="0,00" min="0" step="0.01" oninput="calcPreview()">
+            <input type="text" inputmode="decimal" id="f-valor-ha" placeholder="0,00" oninput="calcPreview()" onchange="calcPreview()">
           </div>
           <div class="field">
             <label>Status de Pagamento</label>
@@ -805,19 +823,12 @@ body {
         <!-- Quem arrumou o serviço -->
         <div style="margin-bottom:18px;">
           <div style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Quem Arrumou o Serviço</div>
-          <div class="form-grid">
-            <div class="field">
-              <label>Nome</label>
-              <input type="text" id="c-arruma-nome" placeholder="Ex: Romário" oninput="calcPreview()">
-            </div>
-            <div class="field">
-              <label>Valor por ha</label>
-              <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
-                <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--green-mid);flex:1;text-align:center;">R$ 5,00 / ha</div>
-                <input type="hidden" id="c-arruma-val" value="5">
-              </div>
-            </div>
+          <div class="field" style="margin-bottom:10px;">
+            <label>Nome</label>
+            <input type="text" id="c-arruma-nome" placeholder="Ex: Romário" oninput="calcPreview()">
           </div>
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--green-mid);text-align:center;">R$ 5,00 / ha — Fixo</div>
+          <input type="hidden" id="c-arruma-val" value="5">
         </div>
 
         <div style="height:1px;background:var(--border);margin-bottom:18px;"></div>
@@ -825,50 +836,43 @@ body {
         <!-- Piloto -->
         <div>
           <div style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Piloto (Execução)</div>
-          <div class="form-grid" style="margin-bottom:12px;">
-            <div class="field">
-              <label>Nome do Piloto</label>
-              <input type="text" id="c-piloto-nome" placeholder="Ex: João" oninput="calcPreview()">
-            </div>
+          <div class="field" style="margin-bottom:12px;">
+            <label>Nome do Piloto</label>
+            <input type="text" id="c-piloto-nome" placeholder="Ex: João" oninput="calcPreview()">
           </div>
 
           <!-- Dia Normal -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px;align-items:end;">
-            <div class="field">
-              <label>Hectares — Dia Normal</label>
-              <input type="number" id="c-piloto-ha-normal" placeholder="0" min="0" step="0.1" oninput="calcPreview()">
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:14px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:700;color:var(--green-mid);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">☀️ Dia Normal — R$ 3,00/ha</div>
+            <div class="field" style="margin-bottom:8px;">
+              <label>Hectares</label>
+              <input type="text" inputmode="decimal" id="c-piloto-ha-normal" placeholder="0" oninput="calcPreview()" onchange="calcPreview()" style="background:white;">
             </div>
-            <div class="field">
-              <label>Valor fixo / ha</label>
-              <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--green-mid);text-align:center;">R$ 3,00 / ha</div>
-            </div>
-            <div class="field">
-              <label>Subtotal</label>
-              <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--text);text-align:center;" id="c-piloto-sub-normal">R$ 0,00</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:var(--muted);">Subtotal</span>
+              <span style="font-size:15px;font-weight:700;color:var(--green-mid);" id="c-piloto-sub-normal">R$ 0,00</span>
             </div>
           </div>
 
           <!-- Domingo / Feriado -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px;align-items:end;">
-            <div class="field">
-              <label>Hectares — Domingo/Feriado</label>
-              <input type="number" id="c-piloto-ha-feriado" placeholder="0" min="0" step="0.1" oninput="calcPreview()">
+          <div style="background:#fff8ec;border:1px solid #f0dda0;border-radius:3px;padding:14px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:700;color:#92400e;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">🌟 Domingo / Feriado — R$ 6,00/ha</div>
+            <div class="field" style="margin-bottom:8px;">
+              <label>Hectares</label>
+              <input type="text" inputmode="decimal" id="c-piloto-ha-feriado" placeholder="0" oninput="calcPreview()" onchange="calcPreview()" style="background:white;">
             </div>
-            <div class="field">
-              <label>Valor fixo / ha</label>
-              <div style="background:#fff8ec;border:1px solid #f0dda0;border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:#92400e;text-align:center;">R$ 6,00 / ha</div>
-            </div>
-            <div class="field">
-              <label>Subtotal</label>
-              <div style="background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--text);text-align:center;" id="c-piloto-sub-feriado">R$ 0,00</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:#92400e;">Subtotal</span>
+              <span style="font-size:15px;font-weight:700;color:#92400e;" id="c-piloto-sub-feriado">R$ 0,00</span>
             </div>
           </div>
 
           <!-- Total piloto -->
-          <div style="background:var(--green-dark);border-radius:3px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:var(--green-dark);border-radius:3px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
             <span style="color:rgba(245,240,232,0.7);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Total Piloto</span>
             <span style="color:var(--gold);font-size:17px;font-weight:700;" id="c-piloto-preview">R$ 0,00</span>
           </div>
+          <button type="button" id="btn-calc" style="width:100%;margin-top:10px;background:var(--green-mid);color:white;border:none;border-radius:3px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">🔄 Atualizar Cálculo</button>
         </div>
 
       </div>
@@ -907,12 +911,17 @@ body {
       <div class="card-body">
         <div class="field">
           <label>Observações (opcional)</label>
-          <textarea id="f-obs" placeholder="Alguma observação sobre o serviço..."></textarea>
+          <textarea id="f-obs" placeholder="Alguma observação sobre o serviço..." 
+            style="min-height:100px;"
+            onfocus="setTimeout(()=>{ this.scrollIntoView({behavior:'smooth', block:'center'}); }, 500)"></textarea>
         </div>
       </div>
     </div>
 
     <button class="btn-primary" onclick="salvarServico()">✅ Salvar e Gerar Recibo</button>
+    
+    <!-- Espaço extra para o teclado não cobrir o botão no celular -->
+    <div style="height:320px;"></div>
   </div>
 
   <!-- PAINEL: HISTÓRICO -->
@@ -1063,20 +1072,25 @@ function fmt(v) {
   return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
+function parseNum(val) {
+  if (!val) return 0;
+  // Aceita tanto ponto quanto vírgula
+  return parseFloat(String(val).replace(',', '.')) || 0;
+}
+
 function calcPreview() {
-  const ha = parseFloat(document.getElementById('f-ha').value) || 0;
-  const vha = parseFloat(document.getElementById('f-valor-ha').value) || 0;
+  const ha = parseNum(document.getElementById('f-ha').value);
+  const vha = parseNum(document.getElementById('f-valor-ha').value);
   const bruto = ha * vha;
 
+  const pilotoHaNormal = parseNum(document.getElementById('c-piloto-ha-normal').value);
+  const pilotoHaFeriado = parseNum(document.getElementById('c-piloto-ha-feriado').value);
   const arrumaNome = document.getElementById('c-arruma-nome').value.trim();
-  const pilotoNome = document.getElementById('c-piloto-nome').value.trim();
-  const pilotoHaNormal = parseFloat(document.getElementById('c-piloto-ha-normal').value) || 0;
-  const pilotoHaFeriado = parseFloat(document.getElementById('c-piloto-ha-feriado').value) || 0;
 
   const comArruma = arrumaNome ? ha * 5 : 0;
   const comPilotoNormal = pilotoHaNormal * 3;
   const comPilotoFeriado = pilotoHaFeriado * 6;
-  const comPiloto = pilotoNome ? (comPilotoNormal + comPilotoFeriado) : 0;
+  const comPiloto = comPilotoNormal + comPilotoFeriado;
   const totalCom = comArruma + comPiloto;
   const liquido = bruto - totalCom;
 
@@ -1095,15 +1109,15 @@ function salvarServico() {
   const dataIni = document.getElementById('f-data-ini').value;
   const dataFim = document.getElementById('f-data-fim').value;
   const tipo = document.getElementById('f-tipo').value.trim();
-  const ha = parseFloat(document.getElementById('f-ha').value) || 0;
-  const vha = parseFloat(document.getElementById('f-valor-ha').value) || 0;
+  const ha = parseNum(document.getElementById('f-ha').value);
+  const vha = parseNum(document.getElementById('f-valor-ha').value);
   const status = document.getElementById('f-status').value;
   const obs = document.getElementById('f-obs').value.trim();
 
   const arrumaNome = document.getElementById('c-arruma-nome').value.trim();
   const pilotoNome = document.getElementById('c-piloto-nome').value.trim();
-  const pilotoHaNormal = parseFloat(document.getElementById('c-piloto-ha-normal').value) || 0;
-  const pilotoHaFeriado = parseFloat(document.getElementById('c-piloto-ha-feriado').value) || 0;
+  const pilotoHaNormal = parseNum(document.getElementById('c-piloto-ha-normal').value);
+  const pilotoHaFeriado = parseNum(document.getElementById('c-piloto-ha-feriado').value);
   const comPilotoNormal = pilotoHaNormal * 3;
   const comPilotoFeriado = pilotoHaFeriado * 6;
   const comPilotoTotal = comPilotoNormal + comPilotoFeriado;
@@ -1460,6 +1474,28 @@ window.addEventListener('load', () => {
   const url = getSheetUrl();
   const input = document.getElementById('sheet-url-input');
   if (input && url) input.value = url;
+});
+
+// Scroll automático quando teclado aparece no celular
+document.querySelectorAll('input, textarea, select').forEach(el => {
+  el.addEventListener('focus', function() {
+    setTimeout(() => {
+      this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 400);
+  });
+});
+
+// Botão atualizar cálculo
+document.getElementById('btn-calc').addEventListener('click', function() {
+  var hn = parseNum(document.getElementById('c-piloto-ha-normal').value);
+  var hf = parseNum(document.getElementById('c-piloto-ha-feriado').value);
+  var sn = hn * 3;
+  var sf = hf * 6;
+  var tot = sn + sf;
+  document.getElementById('c-piloto-sub-normal').textContent = fmt(sn);
+  document.getElementById('c-piloto-sub-feriado').textContent = fmt(sf);
+  document.getElementById('c-piloto-preview').textContent = fmt(tot);
+  calcPreview();
 });
 
 // Fechar modal clicando fora
